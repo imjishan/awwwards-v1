@@ -4,17 +4,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 
-gsap.registerPlugin(ScrollTrigger);
+// Check if we're in the browser before registering GSAP plugins
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 interface ThreeRefs {
   scene: THREE.Scene | null;
   camera: THREE.PerspectiveCamera | null;
   renderer: THREE.WebGLRenderer | null;
-  composer: EffectComposer | null;
   stars: THREE.Points[];
   nebula: THREE.Mesh | null;
   mountains: THREE.Mesh[];
@@ -57,7 +56,6 @@ export const HorizonHeroSection: React.FC = () => {
     scene: null,
     camera: null,
     renderer: null,
-    composer: null,
     stars: [],
     nebula: null,
     mountains: [],
@@ -97,19 +95,6 @@ export const HorizonHeroSection: React.FC = () => {
       refs.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       refs.renderer.toneMapping = THREE.ACESFilmicToneMapping;
       refs.renderer.toneMappingExposure = 0.5;
-
-      // Post-processing
-      refs.composer = new EffectComposer(refs.renderer);
-      const renderPass = new RenderPass(refs.scene, refs.camera);
-      refs.composer.addPass(renderPass);
-
-      const bloomPass = new UnrealBloomPass(
-        new THREE.Vector2(window.innerWidth, window.innerHeight),
-        0.8,
-        0.4,
-        0.85
-      );
-      refs.composer.addPass(bloomPass);
 
       // Create scene elements
       createStarField();
@@ -211,7 +196,9 @@ export const HorizonHeroSection: React.FC = () => {
         });
 
         const stars = new THREE.Points(geometry, material);
-        refs.scene.add(stars);
+        if (refs.scene) {
+          refs.scene.add(stars);
+        }
         refs.stars.push(stars);
       }
     };
@@ -271,7 +258,9 @@ export const HorizonHeroSection: React.FC = () => {
       const nebula = new THREE.Mesh(geometry, material);
       nebula.position.z = -1050;
       nebula.rotation.x = 0;
-      refs.scene.add(nebula);
+      if (refs.scene) {
+        refs.scene.add(nebula);
+      }
       refs.nebula = nebula;
     };
 
@@ -314,7 +303,9 @@ export const HorizonHeroSection: React.FC = () => {
         mountain.position.z = layer.distance;
         mountain.position.y = layer.distance;
         mountain.userData = { baseZ: layer.distance, index, targetZ: layer.distance };
-        refs.scene.add(mountain);
+        if (refs.scene) {
+          refs.scene.add(mountain);
+        }
         refs.mountains.push(mountain);
       });
     };
@@ -359,7 +350,9 @@ export const HorizonHeroSection: React.FC = () => {
       });
 
       const atmosphere = new THREE.Mesh(geometry, material);
-      refs.scene.add(atmosphere);
+      if (refs.scene) {
+        refs.scene.add(atmosphere);
+      }
     };
 
     const animate = () => {
@@ -371,13 +364,19 @@ export const HorizonHeroSection: React.FC = () => {
       // Update stars
       refs.stars.forEach((starField) => {
         if (starField.material && 'uniforms' in starField.material && starField.material.uniforms) {
-          starField.material.uniforms.time.value = time;
+          const uniforms = starField.material.uniforms as any;
+          if (uniforms.time) {
+            uniforms.time.value = time;
+          }
         }
       });
 
       // Update nebula
       if (refs.nebula && refs.nebula.material && 'uniforms' in refs.nebula.material && refs.nebula.material.uniforms) {
-        refs.nebula.material.uniforms.time.value = time * 0.5;
+        const uniforms = refs.nebula.material.uniforms as any;
+        if (uniforms.time) {
+          uniforms.time.value = time * 0.5;
+        }
       }
 
       // Smooth camera movement with easing
@@ -404,8 +403,8 @@ export const HorizonHeroSection: React.FC = () => {
         mountain.position.y = 50 + (Math.cos(time * 0.15) * 1 * parallaxFactor);
       });
 
-      if (refs.composer) {
-        refs.composer.render();
+      if (refs.renderer) {
+        refs.renderer.render(refs.scene!, refs.camera!);
       }
     };
 
@@ -414,11 +413,10 @@ export const HorizonHeroSection: React.FC = () => {
     // Handle resize
     const handleResize = () => {
       const { current: refs } = threeRefs;
-      if (refs.camera && refs.renderer && refs.composer) {
+      if (refs.camera && refs.renderer) {
         refs.camera.aspect = window.innerWidth / window.innerHeight;
         refs.camera.updateProjectionMatrix();
         refs.renderer.setSize(window.innerWidth, window.innerHeight);
-        refs.composer.setSize(window.innerWidth, window.innerHeight);
       }
     };
 
@@ -476,59 +474,61 @@ export const HorizonHeroSection: React.FC = () => {
     if (!isReady || typeof window === 'undefined') return;
     
     // Set initial states to prevent flash
-    gsap.set([menuRef.current, titleRef.current, subtitleRef.current, scrollProgressRef.current], {
-      visibility: 'visible'
-    });
-
-    const tl = gsap.timeline();
-
-    // Animate menu
-    if (menuRef.current) {
-      tl.from(menuRef.current, {
-        x: -100,
-        opacity: 0,
-        duration: 1,
-        ease: "power3.out"
+    if (typeof gsap !== 'undefined') {
+      gsap.set([menuRef.current, titleRef.current, subtitleRef.current, scrollProgressRef.current], {
+        visibility: 'visible'
       });
-    }
 
-    // Animate title with split text
-    if (titleRef.current) {
-      const titleChars = titleRef.current.querySelectorAll('.title-char');
-      tl.from(titleChars, {
-        y: 200,
-        opacity: 0,
-        duration: 1.5,
-        stagger: 0.05,
-        ease: "power4.out"
-      }, "-=0.5");
-    }
+      const tl = gsap.timeline();
 
-    // Animate subtitle lines
-    if (subtitleRef.current) {
-      const subtitleLines = subtitleRef.current.querySelectorAll('.subtitle-line');
-      tl.from(subtitleLines, {
-        y: 50,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.2,
-        ease: "power3.out"
-      }, "-=0.8");
-    }
+      // Animate menu
+      if (menuRef.current) {
+        tl.from(menuRef.current, {
+          x: -100,
+          opacity: 0,
+          duration: 1,
+          ease: "power3.out"
+        });
+      }
 
-    // Animate scroll indicator
-    if (scrollProgressRef.current) {
-      tl.from(scrollProgressRef.current, {
-        opacity: 0,
-        y: 50,
-        duration: 1,
-        ease: "power2.out"
-      }, "-=0.5");
-    }
+      // Animate title with split text
+      if (titleRef.current) {
+        const titleChars = titleRef.current.querySelectorAll('.title-char');
+        tl.from(titleChars, {
+          y: 200,
+          opacity: 0,
+          duration: 1.5,
+          stagger: 0.05,
+          ease: "power4.out"
+        }, "-=0.5");
+      }
 
-    return () => {
-      tl.kill();
-    };
+      // Animate subtitle lines
+      if (subtitleRef.current) {
+        const subtitleLines = subtitleRef.current.querySelectorAll('.subtitle-line');
+        tl.from(subtitleLines, {
+          y: 50,
+          opacity: 0,
+          duration: 1,
+          stagger: 0.2,
+          ease: "power3.out"
+        }, "-=0.8");
+      }
+
+      // Animate scroll indicator
+      if (scrollProgressRef.current) {
+        tl.from(scrollProgressRef.current, {
+          opacity: 0,
+          y: 50,
+          duration: 1,
+          ease: "power2.out"
+        }, "-=0.5");
+      }
+
+      return () => {
+        tl.kill();
+      };
+    }
   }, [isReady]);
 
   // Scroll handling
@@ -599,6 +599,27 @@ export const HorizonHeroSection: React.FC = () => {
       </span>
     ));
   };
+
+  // Render fallback if not ready or on server
+  if (typeof window === 'undefined' || !isReady) {
+    return (
+      <div className="hero-container cosmos-style">
+        <div className="hero-content cosmos-content">
+          <h1 className="hero-title">
+            HORIZON
+          </h1>
+          <div className="hero-subtitle cosmos-subtitle">
+            <p className="subtitle-line">
+              Where vision meets reality, 
+            </p>
+            <p className="subtitle-line">
+              we shape the future of tomorrow
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
