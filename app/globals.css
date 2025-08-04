@@ -21,7 +21,7 @@
 }
 
 body {
-  background: var(--background);
+  background: transparent;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -74,7 +74,7 @@ html {
   position: relative;
   height: 100vh;
   overflow: hidden;
-  background: #000;
+  background: transparent;
   font-family: 'Arial', sans-serif;
 }
 
@@ -88,7 +88,7 @@ html {
 }
 
 .cosmos-style {
-  background: radial-gradient(ellipse at center, #1a1a2e 0%, #16213e 50%, #000000 100%);
+  background: transparent;
 }
 
 /* Side Menu */

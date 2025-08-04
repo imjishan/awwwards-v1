@@ -2,7 +2,7 @@ import { HeroOdyssey } from '../components/ui/hero-odyssey';
 
 export default function Home() {
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen relative">
       <HeroOdyssey 
         title="Your Name"
         subtitle="Full Stack Developer"
