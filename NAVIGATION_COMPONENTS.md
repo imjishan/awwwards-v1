@@ -1,6 +1,26 @@
 # Navigation Components
 
-This project includes two navigation components inspired by awwwards.com:
+This project includes navigation components inspired by awwwards.com with global navigation available on all pages:
+
+## Global Navigation
+
+The navigation bar is now available on **all pages** of the website through the global layout. It automatically appears at the bottom center of every page and provides consistent navigation throughout the site.
+
+### Features:
+- **Global availability** - appears on all pages automatically
+- **Scroll-aware behavior** - hides when scrolling down, reappears when scrolling up
+- **Smart navigation** - scrolls to sections on the same page or navigates to different pages
+- **Context-aware** - different navigation items for different pages
+- **Smooth animations** - spring-based animations for natural feel
+
+### How it works:
+1. The `GlobalNavigation` component is included in the root layout (`app/layout.tsx`)
+2. It automatically detects the current page and shows appropriate navigation items
+3. On the main page, it scrolls to sections (Home, About, Projects, Services, Contact)
+4. On demo pages, it shows relevant navigation items
+5. The navigation is hidden on the TOC demo page to avoid conflicts
+
+## Individual Components
 
 ## 1. ScrollAwareNavbar
 
@@ -86,11 +106,22 @@ function MyComponent() {
 
 ## Demo Pages
 
+### Main Page (`/`)
+The main page now includes sections that the global navigation can scroll to:
+- Home (hero section)
+- About
+- Projects  
+- Services
+- Contact
+
 ### Navbar Demo
 Visit `/navbar-demo` to see the ScrollAwareNavbar in action with sample content.
 
 ### TOC Demo
 Visit `/toc-demo` to see the DynamicScrollIslandTOC component with image filtering.
+
+### Test Page
+Visit `/test` to verify the global navigation works on all pages.
 
 ## Dependencies
 

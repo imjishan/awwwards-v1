@@ -68,13 +68,10 @@ export default function NavbarDemo() {
         </section>
       ))}
 
-      {/* Scroll-Aware Navigation Bar */}
-      <ScrollAwareNavbar
-        items={navItems}
-        activeItem={activeItem}
-        onItemSelect={handleItemSelect}
-        position="bottom-center"
-      />
+      {/* Note: Global navigation is now available on all pages */}
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 bg-black/80 backdrop-blur-sm rounded-full px-4 py-2 text-white text-sm">
+        Global navigation is now active on all pages!
+      </div>
     </div>
   );
 }
