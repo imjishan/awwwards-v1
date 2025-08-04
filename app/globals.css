@@ -4,11 +4,21 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --d-bg: 0 0% 100%;
+  --d-muted: 0 0% 90%;
+  --d-fg: 0 0% 0%;
+  --d-border: 0 0% 90%;
+  --d-sheet: 0 0% 98%;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-d-bg: hsl(var(--d-bg));
+  --color-d-fg: hsl(var(--d-fg));
+  --color-d-border: hsl(var(--d-border));
+  --color-d-sheet: hsl(var(--d-sheet));
+  --color-d-muted: hsl(var(--d-muted));
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -316,6 +326,19 @@ html {
 /* Performance optimizations */
 .hero-canvas {
   will-change: transform;
+}
+
+/* Dot background for TOC demo */
+.dot-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+  z-index: -1;
 }
 
 .title-char {
